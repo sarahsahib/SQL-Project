@@ -1,0 +1,198 @@
+create database EquipmentDepot3;
+use EquipmentDepot3;
+
+create table customer (
+customer_id int (5) not null auto_increment primary key,
+c_name varchar (30) not null,
+c_age int (3) not null,
+c_cc int (16) not null,
+c_membership boolean not null,
+c_membership_fee_paid boolean,
+c_email varchar(30) not null,
+c_address varchar(30) not null,
+c_city varchar(20) not null,
+c_zip int (5) not null,
+c_state varchar (2) not null);
+
+create table inventory (
+inventory_id int (2) not null auto_increment primary key,
+i_serial_number int (5) not null,
+i_date_bought date not null,
+i_condition varchar (20) not null,
+i_type varchar(10) not null);
+
+create table manufacture (
+manufacture_name varchar (20) not null primary key);
+create table product (
+product_id int (9) not null auto_increment primary key,
+manufacture_name varchar(50) not null,
+inventory_id int (2),
+p_name varchar (50) not null,
+p_cost decimal(6,2),
+CONSTRAINT prod_manu_name foreign key (manufacture_name) references
+manufacture (manufacture_name),
+constraint prod_inv_id foreign key (inventory_id) references inventory
+(inventory_id));
+
+create table promotion (
+promotion_id int (2) not null auto_increment primary key,
+product_id int (9) not null,
+p_type varchar (10) not null,
+p_discount_percentage int (2),
+p_rebate_amount int (3),
+constraint promo_product_id foreign key (product_id) references product
+(product_id));
+
+create table warranty (
+warranty_id int (2) not null auto_increment primary key,
+w_type varchar (30) not null);
+
+create table orders (
+order_no int (5) not null auto_increment primary key,
+customer_id int (5) not null,
+o_item_qty int (4) not null,
+o_total decimal (6,2) not null,
+o_date date not null,
+o_ship_date date not null,
+o_status varchar (10) not null,
+o_payment_type varchar (20) not null,
+o_payment_status varchar (10) not null,
+constraint order_customer_id foreign key (customer_id) references customer
+(customer_id));
+
+create table orderDetails (
+order_details_id int (5) not null auto_increment primary key,
+order_no int (5) not null,
+warranty_id int (2),
+product_id int (5) not null,
+od_cost decimal (6,2) not null,
+od_trade_in_value decimal (6,2),
+od_rental_duration varchar (20),
+od_delivery_method varchar (20),
+constraint od_order_no foreign key (order_no) references orders (order_no),
+constraint od_warrant_id foreign key (warranty_id) references warranty
+(warranty_id),
+constraint od_product_id foreign key (product_id) references product
+(product_id));
+
+INSERT INTO customer values
+(0, 'Sarah', 30, 0000000000000001, true, true, 'sarah.hu@gmail.com', '831 parkridge', 'parkridge',
+76706, 'IL');
+INSERT INTO customer values
+(0, 'Yaisr', 34, 0000000000000002, true, true, 'yasir@gmail.com', '8352 concord dr', 'Morton Gorve',
+60053, 'IL');
+insert into customer values
+(0, 'Ali', 45, 0000000000000003, false, false, 'Ali@gmail.com', '161 N. 10th
+St', 'Chicago', 60610, 'IL');
+insert into manufacture values
+('Ultra');
+insert into manufacture values
+('Alta');
+insert into manufacture values
+('Hanna');
+insert into manufacture values
+('MTI');
+insert into manufacture values
+('Syscon');
+insert into warranty values
+(0, '1 year warranty');
+insert into warranty values
+(0, '3 year warranty');
+insert into warranty values
+(0, '5 year warranty');
+insert into inventory values
+(0, 12345, '2010-8-04', 'Used', 'Rent');
+insert into inventory values
+(0, 23456, '2008-8-08', 'New', 'Buy');
+insert into inventory values
+(0, 93993, '2011-4-22', 'Poor', 'Buy');
+insert into inventory values
+(0, 94949, '2001-1-01', 'Excellent', 'Rent');
+insert into product values (
+0, 'Alta', 1, 'HP Gas Automatic Lawn Tractor', 1499.00);
+insert into product values (
+0, 'MTI', 2, 'Air Cooled Standby Generator', 4999.00);
+insert into product values (
+0, 'Syscon', 3, 'Electric Gas Pressure Washer',299.00);
+insert into product values (
+0, 'Hanna', 3, 'Trimmer and Blower
+Combo Kit', 199.00);
+insert into product values (
+0, 'Ultra', 3, 'Gas Front-Engine Lawn Tractor', 1699.00);
+insert into promotion values
+(0, 1, 'Rebate', null, 100);
+insert into promotion values
+(0, 2, 'Discount', 5, 0);
+insert into promotion values
+(0, 3, 'Rebate', null, 400);
+insert into orders values
+(0, 3, 2, 3000.00, '2018-05-23', '2018-05-28', 'Shipped', 'Cash', 'Paid');
+insert into orders values
+(0, 1, 1, 299.00, '2018-04-22', '2018-04-24', 'Shipped', 'Credit', 'Paid');
+insert into orders values
+(0, 2, 2, 498.00, '2018-06-01', '2018-06-23', 'Shipped', 'Check', 'Paid');
+insert into orderDetails values
+(0, 1, null, 1, 1499.00, null, null, null);
+insert into orderDetails values
+(0, 1, 1, 5, 1699.00, null, null, null);
+insert into orderDetails values
+(0, 2, null, 1, 1499.00, 800.00, null, null);
+insert into orderDetails values
+(0, 3, 2, 3, 299.00, null, '3 months', 'pick up');
+insert into orderDetails values
+(0, 3, 2, 4, 199.00, null, '3 months', 'delivery');
+create user storeManager3 identified by 'password';
+create user salesman3 identified by 'password';
+create user marketstaff3 identified by 'password';
+create user DBA3 identified by 'password';
+create user DBDesigner3 identified by 'password';
+GRANT ALL ON equipmentdepot3.* TO DBA3;
+GRANT CREATE, ALTER, DROP ON equipmentdepot3.* TO DBDesigner3;
+GRANT SELECT, INSERT, DELETE, UPDATE ON equipmentdepot3.product TO storeManager3;
+GRANT SELECT, DELETE, UPDATE ON equipmentdepot3.customer TO storeManager3,
+salesman3;
+GRANT SELECT, DELETE, UPDATE ON equipmentdepot3.orders TO storeManager3, salesman3;
+GRANT SELECT, DELETE, UPDATE ON equipmentdepot3.orderDetails TO storeManager3,
+salesman3;
+GRANT SELECT, INSERT ON equipmentdepot3.promotion TO storeManager3;
+GRANT SELECT ON equipmentdepot3.orders TO marketstaff3;
+GRANT SELECT ON equipmentdepot3.orderDetails TO marketstaff3;
+GRANT SELECT ON equipmentdepot3.product TO marketstaff3;
+GRANT SELECT ON equipmentdepot3.customer TO marketstaff3;
+/*The StoreManager can Add/Delete/Update products*/
+update product set p_cost = 2600 where product_id = 6;
+/*The StoreManager can create special-discounts for the different products*/
+insert into promotion values
+(5, 4, 'Discount', 10, null);
+/*Salesmen and StoreManager can create Delete/Update customer accounts and
+Orders*/
+update orders set o_total = 4000.00 where order_no = 1;
+update customer set c_age = 36 where customer_id = 3;
+/*Marketing staff can execute queries to generate reports about the products,
+orders, customers, etc.*/
+select * from product;
+select * from customer;
+select * from orders;
+select * from orderDetails;
+/*The customer can place an order, check the status of an order, or cancel an
+order.*/
+select * from orders where order_no = 1;
+/*The customer has the choice to enroll (or cancel) and become
+PowerMember in order to receive 5% discount for every item
+purchased or leased for an annual fee of $30*/
+update orders o, customer c set o.o_total = o.o_total - (o.o_total * 5.0/100)
+where c.c_membership = 1 and c.c_membership_fee_paid = 1 ;
+/*Due to storage space limitation, the store requires to have at least 50% of
+its rental equipment be leased out to its customers
+at any time. If that threshold is violated, the store will send 25%
+discount promotional lease offers through email to its customers*/
+select count(inventory_id), i_type, concat(round(((i_type =
+'Rent')/count(inventory_id) * 100), 2), '%') as percentage from inventory where
+i_type = 'Rent' group by i_type;
+select c_email from customer;
+/*To minimize the cost of restocking new equipment at the end of
+every season (winter and summer mainly), the retailer emails its
+customers about the 20% discount for the clearance event at the end of every
+season. */
+update product set p_cost = p_cost - (p_cost * 20.0/100);
+select c_email from customer;
